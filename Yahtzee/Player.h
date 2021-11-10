@@ -22,9 +22,8 @@ private:
 
 public:
 	Player(const char* name, const char* password, int hScore);
-	Player();
 	~Player();
-	void setPlayer(char* name, char* password, int hScore);
+	//void setPlayer(char* name, char* password, int hScore);
 	void loadPlayerHistory();
 	void displayPlayerStats() const;
 	void displayPlayer() const;

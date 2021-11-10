@@ -6,15 +6,11 @@ const int BUFFER_SIZE = 11;
 
 
 Player::Player(const char* name, const char* password, int hScore) : 
-	name((char*)malloc(sizeof(char) * BUFFER_SIZE)), 
-	password((char*)malloc(sizeof(char)* BUFFER_SIZE)),
+	name(_strdup(name)),			// dynamically allocates memory using malloc
+	password(_strdup(password)),	// dynamically allocates memory using malloc
 	hScore(hScore)
 {	
 	gameHistory = (int*)malloc(sizeof(int) * 4);
-}
-
-Player::Player()
-{
 }
 
 Player::~Player()
@@ -22,14 +18,15 @@ Player::~Player()
 	// 'delete' calls this and releases the memory
 	free(name);
 	free(password);
+	free(gameHistory);
 }
 
-void Player::setPlayer(char* name, char* password, int hScore)
-{
-	this->name = _strdup(name);
-	this->password = _strdup(password);
-	this->hScore = hScore;
-}
+//void Player::setPlayer(char* name, char* password, int hScore)
+//{
+//	this->name = _strdup(name);
+//	this->password = _strdup(password);
+//	this->hScore = hScore;
+//}
 
 void Player::loadPlayerHistory()
 {

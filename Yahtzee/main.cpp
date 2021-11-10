@@ -38,7 +38,7 @@ int main()
 {
      
 #ifdef _DEBUG
-//_CrtSetBreakAlloc(193);
+//_CrtSetBreakAlloc(179);
     _onexit(_CrtDumpMemoryLeaks);
 #endif
 
@@ -283,8 +283,8 @@ void addPlayer(vector<Player*>& players)
         
         
         // create a new player object with this name and password, and set all others to 0/null
-        Player* player = new Player();
-        player->setPlayer(name, password, 0);
+        Player* player = new Player(name, password, 0);
+        //player->setPlayer(name, password, 0);
 
 
         players.push_back(player); // add player to list 
@@ -346,7 +346,7 @@ void freeMemory(vector<Player*> players)
     }
 
     // vector will delete itself when it goes out of scope?
-    //players.erase(players.begin(), players.end());
+    players.erase(players.begin(), players.end());
 }
 
 void initlist(vector<Player*>& players)
@@ -360,8 +360,7 @@ void initlist(vector<Player*>& players)
     char name1[] = "uwais";
     char password1[] = "u12345";
     
-    Player* p1 = new Player();
-    p1->setPlayer(name1, password1, 100);
+    Player* p1 = new Player(name1, password1, 100);
 
     players.push_back(p1);
 
@@ -369,24 +368,21 @@ void initlist(vector<Player*>& players)
     char name2[] = "jay";
     char password2[] = "j12345";
 
-    Player* p2 = new Player();
-    p2->setPlayer(name2, password2, 199);;
+    Player* p2 = new Player(name2, password2, 199);
 
     players.push_back(p2);
 
     char name3[] = "harry";
     char password3[] = "h12345";
 
-    Player* p3 = new Player();
-    p3->setPlayer(name3, password3, 99);
+    Player* p3 = new Player(name3, password3, 99);
 
     players.push_back(p3);
 
     char name4[] = "kayla";
     char password4[] = "k12345";
 
-    Player* p4 = new Player();
-    p4->setPlayer(name4, password4, 50);
+    Player* p4 = new Player(name4, password4, 50);
 
 
     players.push_back(p4);
