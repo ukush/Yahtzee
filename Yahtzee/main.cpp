@@ -3,6 +3,8 @@
 #include <iomanip>
 #include <algorithm>
 #include <functional>
+#include "Die.h"
+#include "Scorecard.h"
 
 using namespace std;
 
@@ -17,21 +19,14 @@ void displayMenu();
 int getMenuChoice(const int firstOption, const int lastOption);
 void printList(const vector<Player*> &players);
 void initlist(vector<Player*>& players);
-
-//vector<Player*>::const_iterator searchName(const vector<Player*>& players);
-//vector<Player*>::const_iterator searchPassword(const vector<Player*>& players);
-//void choosePlayer(const vector<Player*>& players);
 void addPlayer(vector<Player*>& players);
 void removePlayer(vector<Player*>& players);
 void sortAlphabetically(vector<Player*>& players);
 void sortByHighestScore(vector<Player*>& players);
-
 vector<Player*>::const_iterator searchPlayer(const vector<Player*>& players);
-
-void playMenu(const Player* currentPlayer);
-
-
-void freeMemory(vector<Player*> players);
+void playMenu(Player* currentPlayer);
+void playYahtzee(Player* currentPlayer);
+bool allDiceHeld(const vector<Die*>& dice);
 
 
 int main()
@@ -73,6 +68,9 @@ int main()
                     // set game history
                     // currentPlayer->displayGameHistory
                     playMenu(currentPlayer);
+                    // still have current player
+                    // currentPlayer -> updateGameHistory()--> increments the total games, adds on the game score to total accumulated score and adds the scorecard
+            
                 }
                 else
                 {
@@ -105,6 +103,8 @@ int main()
             case MENU_EXIT:
             {
                 // save all information to disk
+                // get the vector of player histories
+                // write each player from the player list to a seperate file based on their name
                 cout << "\nThanks for Playing!\n"; 
                 break;
             }
@@ -120,7 +120,10 @@ int main()
 
 
     //free all memory --> the vector was created and players added in this class, therefore it is this class' responsibility to delete and free the memory
-    freeMemory(players);
+    for (Player* player : players)
+    {
+        delete player;
+    }
     
 	return 0;
 }
@@ -151,7 +154,7 @@ int getMenuChoice(const int firstOption, const int lastOption)
     return choice;
 }
 
-void playMenu(const Player* currentPlayer)
+void playMenu(Player* currentPlayer)
 {
     const int MENU_PLAY_GAME = 1;
     const int MENU_VIEW_SCORECARD = 2;
@@ -174,16 +177,13 @@ void playMenu(const Player* currentPlayer)
         {
         case 1:
         {
-            // load game
-            cout << "Loading game...\n\n";
+            playYahtzee(currentPlayer);
             break;
         }
         case 2:
         {
             cout << "Loading Scorecards...\n\n";
             // load scorecards
-
-            
             break;
 
         }
@@ -336,19 +336,6 @@ void sortByHighestScore(vector<Player*> &players)
    printList(players);
 }
 
-void freeMemory(vector<Player*> players)
-{
-    // call the destructor for each player pointer
-    // It is the Player class' responsibility to free the memory it dynamically allocated (for name and password)
-    for (Player* player : players)
-    {
-        delete player;
-    }
-
-    // vector will delete itself when it goes out of scope?
-    players.erase(players.begin(), players.end());
-}
-
 void initlist(vector<Player*>& players)
 {
     int score1 = 50;
@@ -390,58 +377,303 @@ void initlist(vector<Player*>& players)
     printList(players);
 }
 
-//vector<Player*>::const_iterator searchName(const vector<Player*>& players)
-//{
-//    char name[BUFFER_SIZE];
-//    cout << "\nEnter a name for your player:\n";
-//    cin >> setw(BUFFER_SIZE - 1) >> name;
-//    cin.clear();
-//    cin.ignore(1000, '\n');
-//
-//    // search through list for name match
-//    auto it = find_if(players.begin(), players.end(), [&name](const Player* player) -> bool
-//        {
-//            // return player.getname() == search (overload)
-//            return player->isPlayerName(name);
-//        });
-//
-//    return it;
-//}
+/*Scorecard**/ void playYahtzee(Player* currentPlayer)
+{
+    // the scorecard's gameNumber starts from the totalgames
 
-//vector<Player*>::const_iterator searchPassword(const vector<Player*>& players)
-//{
-//    // take in user input for password
-//    char searchPw[BUFFER_SIZE];
-//    cout << "Enter the player password:\n";
-//    cin >> setw(BUFFER_SIZE - 1) >> searchPw;
-//    cin.clear();
-//    cin.ignore(1000, '\n');
-//
-//    // search through list for password match
-//    auto pw_it = find_if(players.begin(), players.end(), [&searchPw](const Player* player) -> bool
-//        {
-//        return player->isPassword(searchPw);
-//        });
-//
-//    return pw_it;
-//}
-//void choosePlayer(const vector<Player*> &players)
-//{  
-//
-//    auto it = searchPlayer(players);
-//
-//    if (it != players.end())
-//    {
-//        cout << "\nPlayer validated successfully\n";
-//        Player* currentPlayer = (*it);
-//
-//        playMenu(currentPlayer);
-//
-//        // display game menu
-//    }       
-//    else
-//    {
-//        cout << "Incorrect name or password\n";
-//    }
-//    cout << "\n";
-//}
+    Scorecard* scorecard = new Scorecard(1);
+    // display empty scorecard
+    scorecard->printScorecard();
+
+    // Hold the dice in a stl vector
+    vector<Die*> dice;
+
+    // add all 5 dice to vector
+    dice.push_back(new Die());
+    dice.push_back(new Die());
+    dice.push_back(new Die());
+    dice.push_back(new Die());
+    dice.push_back(new Die());
+
+    //seed random number
+    srand(time(nullptr));
+
+    // each game has 5 rounds
+    for (int i = 0; i < 5; i++)
+    {
+        // at the beginning of each round, unhold all the dice
+        for (Die* d : dice)
+        {
+            d->UnholdDie();
+        }
+
+        int rollCount = 0;
+        do
+        {
+            rollCount++;
+
+            // roll all dice and display them
+            cout << "\nRoll # " << rollCount << "\n------------------\n";
+            cout << "You rolled: \n\n";
+            // use for each
+            for (Die* d : dice)
+            {
+                d->rollDie();
+                d->displayDie();
+            }
+            cout << "\n";
+
+            // ask user to hold die
+            cout << "Select the dice you want to hold:\n";
+            cout << "Enter '6' to hold all dice and score your roll\n";
+            cout << "Enter '9' to roll again:\n";
+            cout << "Enter '0' when you've finished holding your dice:\n";
+            int hold;
+            bool holding = true;
+            do {
+                cin >> hold;
+                switch (hold)
+                {
+                case 0:
+                {
+                    holding = false;
+                    break;
+                }
+                case 1:
+                {
+                    dice[0]->holdDie();
+                    break;
+                }
+                case 2:
+                {
+                    dice[1]->holdDie();
+                    break;
+                }
+                case 3:
+                {
+                    dice[2]->holdDie();
+                    break;
+                }
+                case 4:
+                {
+                    dice[3]->holdDie();
+                    break;
+                }
+                case 5:
+                {
+                    dice[4]->holdDie();
+                    break;
+                }
+                case 6:
+                {
+                    dice[0]->holdDie();
+                    dice[1]->holdDie();
+                    dice[2]->holdDie();
+                    dice[3]->holdDie();
+                    dice[4]->holdDie();
+                    holding = false;
+                    break;
+                }
+                case 9:
+                {
+                    holding = false;
+                    break;
+                }
+                default:
+                {
+                    cout << "ERROR: INVALID OPTION\n";
+                    break;
+                }
+
+                }
+            } while (holding);
+
+            cout << "\n\n";
+        } while (rollCount < 2 && !allDiceHeld(dice));
+
+        // only roll again if they're not all held
+        // roll all dice and display them for the last roll
+
+        // check if they're all held don't roll again
+        if (allDiceHeld(dice))
+        {
+            cout << "\nYou've held all your dice...\nHere is your final roll\n";
+            // simply display them
+            for (Die* d : dice)
+            {
+                d->displayDie();
+            }
+            cout << "\n";
+        }
+        else {
+            cout << "\nRoll #3\n------------------\n";
+            cout << "You rolled: \n\n";
+
+            // use for each
+            for (Die* d : dice)
+            {
+                d->rollDie();
+                d->displayDie();
+            }
+            cout << "\n";
+        }
+        //prompt user to score against scorecard
+        cout << "\nScore your dice against one of the following options: \n";
+        cout << "1)\tAces\n";
+        cout << "2)\tTwos\n";
+        cout << "3)\tThrees\n";
+        cout << "4)\tFours\n";
+        cout << "5)\tFives\n";
+        cout << "6)\tSixes\n";
+
+        int scoreAgainst;
+        do {
+            cin >> scoreAgainst;
+            switch (scoreAgainst)
+            {
+            case 1:
+            {
+                // add to aces
+                // iterate through each die and see how many are equal to 1
+
+                int aces = 0;
+                for (Die* d : dice)
+                {
+                    if (d->getDie() == 1)
+                    {
+                        aces++;
+                    }
+                }
+                // add to scorecard
+                scorecard->updateScorecard(0, aces);
+                scorecard->updateTotal(aces);
+                break;
+            }
+            case 2:
+            {
+                // add to twos
+                int twos = 0;
+                for (Die* d : dice)
+                {
+                    if (d->getDie() == 2)
+                    {
+                        twos++;
+                    }
+                }
+                twos *= 2;
+                // add to scorecard
+                scorecard->updateScorecard(1, twos);
+                scorecard->updateTotal(twos);
+                break;
+            }
+            case 3:
+            {
+                // add to threes
+                int threes = 0;
+                for (Die* d : dice)
+                {
+                    if (d->getDie() == 3)
+                    {
+                        threes++;
+                    }
+                }
+                threes *= 3;
+                // add to scorecard
+                scorecard->updateScorecard(2, threes);
+                scorecard->updateTotal(threes);
+                break;
+            }
+            case 4:
+            {
+                // add to fours
+                int fours = 0;
+                for (Die* d : dice)
+                {
+                    if (d->getDie() == 4)
+                    {
+                        fours++;
+                    }
+                }
+                fours *= 4;
+                // add to scorecard
+                scorecard->updateScorecard(3, fours);
+                scorecard->updateTotal(fours);
+                break;
+            }
+            case 5:
+            {
+                // add to fives
+                int fives = 0;
+                for (Die* d : dice)
+                {
+                    if (d->getDie() == 5)
+                    {
+                        fives++;
+                    }
+                }
+                fives *= 5;
+                // add to scorecard
+                scorecard->updateScorecard(4, fives);
+                scorecard->updateTotal(fives);
+                break;
+            }
+            case 6:
+            {
+                // add to sixes
+                int sixes = 0;
+                for (Die* d : dice)
+                {
+                    if (d->getDie() == 6)
+                    {
+                        sixes++;
+                    }
+                }
+                sixes *= 6;
+                // add to scorecard
+                scorecard->updateScorecard(5, sixes);
+                scorecard->updateTotal(sixes);
+                break;
+            }
+            default:
+            {
+                cout << "ERROR: INVALID OPTION\n";
+                break;
+            }
+            }
+        } while (scoreAgainst < 1 || scoreAgainst > 6); // validate input
+
+
+        // display the scorecard for this game
+        scorecard->printScorecard();
+    }
+
+    // save total score in player history
+    // ... = scoreCard->getTotal();
+    // increment total games by 1
+
+
+    // free memory for dice
+    for (Die* d : dice)
+    {
+        delete(d);
+    }
+
+    // return a pointer to a scorecard
+    // or return the memory address of the scorecard
+
+}
+
+bool allDiceHeld(const vector<Die*>& dice)
+{
+    int held = 0;
+
+    for (Die* d : dice)
+    {
+        if (d->isHeld())
+        {
+            held++;
+        }
+    }
+
+    return (held == 5);
+}
