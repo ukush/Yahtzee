@@ -27,17 +27,27 @@ vector<Player*>::const_iterator searchPlayer(const vector<Player*>& players);
 void playMenu(Player* currentPlayer);
 void playYahtzee(Player* currentPlayer);
 bool allDiceHeld(const vector<Die*>& dice);
+char* encryptPassword(char* plaintextPw, int key);
+char* decryptPassword(char* ciphertextPw, int key);
 
 
 int main()
 {
      
 #ifdef _DEBUG
-//_CrtSetBreakAlloc(179);
+//_CrtSetBreakAlloc(273);
     _onexit(_CrtDumpMemoryLeaks);
 #endif
 
     cout << "Weclome to Yahtzee\n------------------\n";
+    
+    
+    char password1[] = "axdz";
+    char* ciphertextPw = encryptPassword(password1, 4);
+    cout << ciphertextPw << "\n";
+    char* plaintextPw = decryptPassword(ciphertextPw, 4);
+    cout << plaintextPw << "\n";
+
     
 
     vector<Player*> players;
@@ -413,7 +423,8 @@ void initlist(vector<Player*>& players)
             rollCount++;
 
             // roll all dice and display them
-            cout << "\nRoll # " << rollCount << "\n------------------\n";
+            cout << "\nRound " << i + 1 << " of 5\n";
+            cout << "Roll # " << rollCount << "\n------------------\n";
             cout << "You rolled: \n\n";
             // use for each
             for (Die* d : dice)
@@ -506,7 +517,8 @@ void initlist(vector<Player*>& players)
             cout << "\n";
         }
         else {
-            cout << "\nRoll #3\n------------------\n";
+            cout << "\nRound " << i + 1 << " of 5\n";
+            cout << "Roll #3\n------------------\n";
             cout << "You rolled: \n\n";
 
             // use for each
@@ -660,7 +672,7 @@ void initlist(vector<Player*>& players)
 
     // return a pointer to a scorecard
     // or return the memory address of the scorecard
-
+    delete scorecard; // should be deleted afterwards if returning  
 }
 
 bool allDiceHeld(const vector<Die*>& dice)
@@ -677,3 +689,70 @@ bool allDiceHeld(const vector<Die*>& dice)
 
     return (held == 5);
 }
+
+char* encryptPassword(char* plaintextPw, int key)
+{
+    /*
+    * Caesar Cipher routine found here - changed slightly
+    * https://www.thecrazyprogrammer.com/2016/11/caesar-cipher-c-c-encryption-decryption.html
+    */
+
+    char c;
+    for (int i = 0; plaintextPw[i] != '\0'; i++)
+    {
+        c = plaintextPw[i]; 
+        if (c >= 97 && c <= 122)            // if between lower case a-z inclusive
+        {
+            c += key;                       // shift 3 letters up 
+            if (c > 122)
+            {   
+                c = c - 122 + 97 - 1;       // if non-letter, wrap around the aplhabet to a letter
+            }               
+            plaintextPw[i] = c;             
+        }
+        else if (c >= 65 && c <= 90)       //  if between upper case A-Z inclusive 
+        {                                  
+            c += key;                      // shift 3 letters up
+            if (c > 90)                   
+            {                              
+                c = c - 90 + 65 - 1;     // wrap around
+            }                              
+            plaintextPw[i] = c;            
+        }
+    }
+
+    return plaintextPw;
+}
+
+char* decryptPassword(char* ciphertextPw, int key)
+{
+    char c;
+    for (int i = 0; ciphertextPw[i] != '\0'; i++)
+    {
+        c = ciphertextPw[i];
+
+        if (c >= 97 && c <= 122)            // if between lower case a-z inclusive
+        {
+            c -= key;                       // shift 3 letters down 
+            if (c < 97)
+            {
+                c = c + 122 - 97 + 1;       // if non-letter, wrap around the aplhabet to a letter
+            }
+            ciphertextPw[i] = c;
+        }
+        else if (c >= 65 && c <= 90)       //  if between upper case A-Z inclusive 
+        {
+            c -= key;                      // shift 3 letters down
+            if (c < 65)
+            {
+                c = c + 90 - 65 + 1;     // wrap around
+            }
+            ciphertextPw[i] = c;
+        }
+    }
+
+    return ciphertextPw;
+}
+
+
+
