@@ -29,5 +29,15 @@ public:
 	bool compareNames(const Player* rhs) const;
 	bool operator < (const Player* rhs) const;
 
+
+	char* getName()
+	{
+		return name;
+	}
+
+
+	friend ostream& operator << (ostream& os, const Player& rhs);
+	friend ostream& operator >> (ostream& os, const Player& rhs);
+
 };
 

@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include "Player.h"
 #include <iomanip>
 #include <algorithm>
@@ -31,6 +32,22 @@ char* encryptPassword(char* plaintextPw, int key);
 char* decryptPassword(char* ciphertextPw, int key);
 
 
+ostream& operator << (ostream& os, const Player& rhs)
+{
+    string name(rhs.name);
+    string Epass(encryptPassword(rhs.password, 3));
+    os << name << ", " << Epass << ", " << rhs.hScore;
+    return os;
+}
+
+ostream& operator >> (ostream& os, const Player& rhs)
+{
+    string name(rhs.name);
+    string Epass(encryptPassword(rhs.password, 3));
+    os << name << ", " << Epass << ", " << rhs.hScore;
+    return os;
+}
+
 int main()
 {
      
@@ -40,24 +57,19 @@ int main()
 #endif
 
     cout << "Weclome to Yahtzee\n------------------\n";
-    
-    
-    char password1[] = "axdz";
-    char* ciphertextPw = encryptPassword(password1, 4);
-    cout << ciphertextPw << "\n";
-    char* plaintextPw = decryptPassword(ciphertextPw, 4);
-    cout << plaintextPw << "\n";
-
-    
+   
 
     vector<Player*> players;
     // load in players from file
     // load name, password, hscore
+
+
+
     // decrypt the password
     // add players to STL vector/list
     initlist(players);
 
-    vector<Player*>::const_iterator it = players.begin();
+   // vector<Player*>::const_iterator it = players.begin();
 
     int choice;
     do
@@ -84,7 +96,7 @@ int main()
                 }
                 else
                 {
-                    cout << "\nERROR: CANNOT FIND PLAYER\n\n";
+                    cout << "\nERROR: INCORRECT USERNAME OR PASSWORD\n\n";
                 }
                 break;
             }
@@ -115,6 +127,36 @@ int main()
                 // save all information to disk
                 // get the vector of player histories
                 // write each player from the player list to a seperate file based on their name
+
+                /*
+                * char * name
+                * char * encrypted password
+                * int highscore
+                * 
+                * int total games
+                * int total score
+                * int average score
+                * int scores --> scorecards 
+                */
+                
+
+                for (Player* player : players)
+                {
+                    string filename(player->getName());
+                    filename = filename + ".txt";
+
+                    ofstream out(filename);
+                    if (out.is_open())
+                    {
+                        out << *player;
+                    }
+                    else
+                    {
+                        cout << "THERE WAS AN ERROR WRITING TO FILE\n";
+                    }
+                }
+
+
                 cout << "\nThanks for Playing!\n"; 
                 break;
             }
