@@ -725,6 +725,11 @@ char* encryptPassword(char* plaintextPw, int key)
 }
 
 char* decryptPassword(char* ciphertextPw, int key)
+
+    /*
+    * Caesar Cipher routine found here - changed slightly
+    * https://www.thecrazyprogrammer.com/2016/11/caesar-cipher-c-c-encryption-decryption.html
+    */
 {
     char c;
     for (int i = 0; ciphertextPw[i] != '\0'; i++)
@@ -753,6 +758,3 @@ char* decryptPassword(char* ciphertextPw, int key)
 
     return ciphertextPw;
 }
-
-
-
