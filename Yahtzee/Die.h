@@ -34,7 +34,14 @@ public:
 
 	void holdDie()
 	{
-		held = true;
+		if (held)
+		{
+			cout << "\nDie is already held. Select another\n";
+		}
+		else
+		{
+			held = true;
+		}
 	}
 
 	void UnholdDie()

@@ -30,23 +30,10 @@ void playYahtzee(Player* currentPlayer);
 bool allDiceHeld(const vector<Die*>& dice);
 char* encryptPassword(char* plaintextPw, int key);
 char* decryptPassword(char* ciphertextPw, int key);
-
-
-ostream& operator << (ostream& os, const Player& rhs)
-{
-    string name(rhs.name);
-    string Epass(encryptPassword(rhs.password, 3));
-    os << name << ", " << Epass << ", " << rhs.hScore;
-    return os;
-}
-
-ostream& operator >> (ostream& os, const Player& rhs)
-{
-    string name(rhs.name);
-    string Epass(encryptPassword(rhs.password, 3));
-    os << name << ", " << Epass << ", " << rhs.hScore;
-    return os;
-}
+ostream& operator << (ostream& os, const Player& rhs);
+//istream& operator >> (istream& is, const Player& rhs);
+istream& operator >> (istream& is, Player& rhs);
+void displayScorecards(Player* currentPlayer);
 
 int main()
 {
@@ -65,11 +52,18 @@ int main()
 
 
 
-    // decrypt the password
-    // add players to STL vector/list
-    initlist(players);
 
-   // vector<Player*>::const_iterator it = players.begin();
+    // decrypt the password
+    // 
+    // add players to STL vector/list
+
+
+
+
+
+
+
+    initlist(players);
 
     int choice;
     do
@@ -82,7 +76,6 @@ int main()
             case MENU_CHOOSE_PLAYER: 
             {   
                 auto it = searchPlayer(players); // search for name and password match
-
                 if (it != players.end())
                 {
                     cout << "\nPlayer validated successfully\n\n";
@@ -92,7 +85,6 @@ int main()
                     playMenu(currentPlayer);
                     // still have current player
                     // currentPlayer -> updateGameHistory()--> increments the total games, adds on the game score to total accumulated score and adds the scorecard
-            
                 }
                 else
                 {
@@ -126,13 +118,8 @@ int main()
             {
                 // save all information to disk
                 // get the vector of player histories
-                // write each player from the player list to a seperate file based on their name
-
+                // write each player from the player list to a seperate file based on their id
                 /*
-                * char * name
-                * char * encrypted password
-                * int highscore
-                * 
                 * int total games
                 * int total score
                 * int average score
@@ -142,9 +129,8 @@ int main()
 
                 for (Player* player : players)
                 {
-                    string filename(player->getName());
-                    filename = filename + ".txt";
-
+                    string id = to_string(player->getPlayerId());
+                    string filename("Player " + id + ".txt");
                     ofstream out(filename);
                     if (out.is_open())
                     {
@@ -155,7 +141,6 @@ int main()
                         cout << "THERE WAS AN ERROR WRITING TO FILE\n";
                     }
                 }
-
 
                 cout << "\nThanks for Playing!\n"; 
                 break;
@@ -179,8 +164,6 @@ int main()
     
 	return 0;
 }
-
-
 
 void displayMenu()
 {
@@ -214,13 +197,14 @@ void playMenu(Player* currentPlayer)
 
 
     cout << "Weclome to Yahtzee Play Arena\n------------------------------\n\n";
+    // load player history from file
+    // if no file exists, it is a new player
     currentPlayer->displayPlayerStats();
     int choice;
 
     do {
-
         cout << "\n1) Play Game\n";
-        cout << "2) View Score Cards\n";
+        cout << "2) View Scorecards\n";
         cout << "9) Return To Main Menu\n";
 
         choice = getMenuChoice(MENU_PLAY_GAME, MENU_RETURN);
@@ -234,17 +218,23 @@ void playMenu(Player* currentPlayer)
         }
         case 2:
         {
-            cout << "Loading Scorecards...\n\n";
-            // load scorecards
-            break;
+            // load player history from file and update player history
+            string id = to_string(currentPlayer->getPlayerId());
+            string filename("Player " + id + ".txt");
+            ifstream in(filename);
+            if (in.is_open())
+            {
+                in >> *currentPlayer;
+            }
 
+            displayScorecards(currentPlayer);
+            break;
         }
         case 9:
         {
             cout << "\n\n";
             break;
         }
-
         default:
         {
             cout << "ERROR: INVALID OPTION\n";
@@ -252,7 +242,7 @@ void playMenu(Player* currentPlayer)
         }
         }
 
-    } while (choice != 9);
+    }while (choice != 9);
 }
 
 void printList(const vector<Player*> &players)
@@ -338,6 +328,8 @@ void addPlayer(vector<Player*>& players)
         Player* player = new Player(name, password, 0);
         //player->setPlayer(name, password, 0);
 
+        player->initHistory();
+
 
         players.push_back(player); // add player to list 
         cout << "\nPlayer added successfully\n";
@@ -355,6 +347,7 @@ void removePlayer(vector<Player*>& players)
     if (it != players.end())
     {
         players.erase(it);
+        // delete file?
         cout << "Player Removed\n";
 
     }
@@ -388,52 +381,14 @@ void sortByHighestScore(vector<Player*> &players)
    printList(players);
 }
 
-void initlist(vector<Player*>& players)
+void playYahtzee(Player* currentPlayer)
 {
-    int score1 = 50;
-    int score2 = 10;
-    int score3 = 9;
-    int score4 = 100;
+    // the scorecard's gameNumber starts from the totalgames + 1
 
+    int gameNumber = currentPlayer->getTotalGames();
+    Scorecard* scorecard = new Scorecard(gameNumber);
+    scorecard->initScores(); // set to 0
 
-    char name1[] = "uwais";
-    char password1[] = "u12345";
-    
-    Player* p1 = new Player(name1, password1, 100);
-
-    players.push_back(p1);
-
-
-    char name2[] = "jay";
-    char password2[] = "j12345";
-
-    Player* p2 = new Player(name2, password2, 199);
-
-    players.push_back(p2);
-
-    char name3[] = "harry";
-    char password3[] = "h12345";
-
-    Player* p3 = new Player(name3, password3, 99);
-
-    players.push_back(p3);
-
-    char name4[] = "kayla";
-    char password4[] = "k12345";
-
-    Player* p4 = new Player(name4, password4, 50);
-
-
-    players.push_back(p4);
-
-    printList(players);
-}
-
-/*Scorecard**/ void playYahtzee(Player* currentPlayer)
-{
-    // the scorecard's gameNumber starts from the totalgames
-
-    Scorecard* scorecard = new Scorecard(1);
     // display empty scorecard
     scorecard->printScorecard();
 
@@ -519,11 +474,13 @@ void initlist(vector<Player*>& players)
                 }
                 case 6:
                 {
-                    dice[0]->holdDie();
-                    dice[1]->holdDie();
-                    dice[2]->holdDie();
-                    dice[3]->holdDie();
-                    dice[4]->holdDie();
+                    for (Die* d : dice)
+                    {
+                        if (!d->isHeld())
+                        {
+                            d->holdDie();
+                        }
+                    }
                     holding = false;
                     break;
                 }
@@ -701,9 +658,18 @@ void initlist(vector<Player*>& players)
         scorecard->printScorecard();
     }
 
+    // check if high score 
+    int gameScore = scorecard->getTotal();
+    //if (currentPlayer->isHighscore(gameScore))
+    //{
+        // update high score
+        currentPlayer->updateHighscore(gameScore);
+    //}
+    
     // save total score in player history
-    // ... = scoreCard->getTotal();
-    // increment total games by 1
+    currentPlayer->updatePlayerHistory(scorecard->getTotal());
+
+    // add scorecard
 
 
     // free memory for dice
@@ -711,10 +677,6 @@ void initlist(vector<Player*>& players)
     {
         delete(d);
     }
-
-    // return a pointer to a scorecard
-    // or return the memory address of the scorecard
-    delete scorecard; // should be deleted afterwards if returning  
 }
 
 bool allDiceHeld(const vector<Die*>& dice)
@@ -799,4 +761,115 @@ char* decryptPassword(char* ciphertextPw, int key)
     }
 
     return ciphertextPw;
+}
+
+ostream& operator << (ostream& os, const Player& rhs)
+{
+    string name(rhs.name);
+    string Epass(encryptPassword(rhs.password, 3));
+    os << name << "\n" << Epass << "\n" << rhs.hScore << "\n" << rhs.history[0] << "\n" << rhs.history[1] << "\n" << rhs.history[2] << "\n";
+    
+    return os;
+}
+
+istream& operator >> (istream& is, Player& rhs)
+{
+
+    return is;
+}
+
+//istream& operator >> (istream& is, Player& rhs)
+//{
+//    int tGames;
+//    int tScore;
+//    int avgScore;
+//    is >> tGames >> tScore >> avgScore;
+//    rhs.setHistory(tGames, tScore, avgScore);
+//    return is;
+//}
+
+void displayScorecards(Player* currentPlayer)
+{
+    cout << "Loading Scorecards...\n\n";
+    int scorecardMenuChoice;
+
+    do {
+        cout << "\n1) View the Previous Scorecard\n";
+        cout << "2) View the Next Scorecard\n";
+        cout << "9) Return To Main Menu\n";
+
+        scorecardMenuChoice = getMenuChoice(1, 9);
+
+
+
+        switch (scorecardMenuChoice)
+        {
+        case 1:
+        {
+            // if current scorecard is .begin() display error
+            
+            break;
+        }
+        case 2:
+        {
+            // if current scorecard is .end() display error
+            break;
+        }
+        case 9:
+        {
+            break;
+        }
+        default:
+        {
+            cout << "ERROR: INVALID OPTION\n";
+            break;
+        }
+
+        }
+    } while (scorecardMenuChoice != 9);
+}
+
+void initlist(vector<Player*>& players)
+{
+    int score1 = 50;
+    int score2 = 10;
+    int score3 = 9;
+    int score4 = 100;
+
+
+    char name1[] = "neil";
+    char password1[] = "neil1";
+
+    Player* p1 = new Player(name1, password1, 100);
+    p1->initHistory();
+
+    players.push_back(p1);
+
+
+    char name2[] = "jay";
+    char password2[] = "jay1";
+
+    Player* p2 = new Player(name2, password2, 199);
+    p2->initHistory();
+
+    players.push_back(p2);
+
+    char name3[] = "harry";
+    char password3[] = "harry1";
+
+    Player* p3 = new Player(name3, password3, 99);
+    p3->initHistory();
+
+    players.push_back(p3);
+
+    char name4[] = "kayla";
+    char password4[] = "kayla1";
+
+    Player* p4 = new Player(name4, password4, 50);
+    p4->initHistory();
+
+
+    players.push_back(p4);
+
+    printList(players);
 }
