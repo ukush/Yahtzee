@@ -71,27 +71,21 @@ int main()
         }
         case MENU_ADD_PLAYER:
         {
-            //addPlayer(players);
             playerLib->addPlayer();
             break;
         }
         case MENU_REMOVE_PLAYER:
         {
-            //removePlayer(players);
             playerLib->removePlayer();
             break;
         };
         case MENU_SORT_ALPHABETICALLY:
         {
-            //instead of compareNames(), overload the '<' operator
-            //sortAlphabetically(players);
             playerLib->sortAlphabetically();
             break;
         }
         case MENU_SORT_HIGHEST_SCORE:
         {
-            //instead of compareScores(), overload the '>' operator
-            //sortByHighestScore(players);
             playerLib->sortByHighestScore();
             break;
         }
@@ -115,13 +109,6 @@ int main()
         }
 
     } while (choice != MENU_EXIT);
-
-
-    //free all memory --> the vector was created and players added in this class, therefore it is this class' responsibility to delete and free the memory
-    //for (Player* player : players)
-    //{
-    //    delete player;
-    //}
 
     return 0;
 }

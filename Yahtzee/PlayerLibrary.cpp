@@ -2,12 +2,27 @@
 
 PlayerLibrary::PlayerLibrary()
 {
+    //MAIN_FILENAME = "Yahtzee.txt";
 
+    // creates objects using the info in the yahtzee.txt file
+    // adds them object to the list
+
+    ifstream in("Yahtzee.txt");
+    
+    while (true)
+    {
+        Player* temp = new Player();
+        in >> *temp;
+        playerList.push_back(temp);
+        if (in.eof())
+            break;
+    }
 
 }
 
 PlayerLibrary::~PlayerLibrary()
 {
+    // release memory for each player in the vector
     for (Player* player : playerList)
     {
         delete(player);
@@ -101,7 +116,11 @@ void PlayerLibrary::savePlayers()
    ofstream out("Yahtzee.txt");
    if (out.is_open())
    {
-       for_each(playerList.begin(), playerList.end(), [&out](Player* player) {out << (*player);});
+       // write player details to text file
+       for_each(playerList.begin(), playerList.end(), [&out](Player* player)
+           {
+               out << (*player); 
+           });
    }
    else
    {
@@ -110,17 +129,27 @@ void PlayerLibrary::savePlayers()
 
     // save player history to specific player file
 
-   for (auto it = playerList.begin(); it != playerList.end(); ++it)
+
+   for (auto it = playerList.begin(); it != playerList.end(); ++it) // use a for loop because we need to the index of the scorecard
    {
+       // track the player object
        auto position = it - playerList.begin();
+
+       // name of file is the name of the player
        string filename(playerList[position]->getName());
        filename = filename + ".txt";
        ofstream out2(filename);
 
-       if (out.is_open())
+       if (out2.is_open())
        {
            for (int i = 0; i < playerList[position]->getNumberOfScorecards(); i++)
            {
+               //write total score, games and avg score to text file
+               out2 << playerList[position]->getTotalScore() << "\n"    
+                   << playerList[position]->getTotalGames() << "\n"
+                   << playerList[position]->getAvgScore() << "\n";
+
+               // write timestamped scorecards to text file
                out2 << *playerList[position]->getScorecard(i);
            }
        }

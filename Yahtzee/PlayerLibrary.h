@@ -13,6 +13,7 @@ class PlayerLibrary
 private:
 	vector<Player*> playerList;
 	static const int BUFFER_SIZE = 11;
+	//static const char* MAIN_FILENAME;
 
 public:
 	PlayerLibrary();

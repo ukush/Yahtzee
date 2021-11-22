@@ -4,10 +4,14 @@
 
 
 
-Player::Player(const char* name, const char* password, int hScore) :
+Player::Player(char* name, char* password, int hScore) :
 
 	name(_strdup(name)),			// dynamically allocates memory using malloc
 	password(_strdup(password)),	// dynamically allocates memory using malloc
+	//name(new char[INPUT_BUFFER_SIZE]),
+	//password(new char[INPUT_BUFFER_SIZE]),
+	//name((char*)malloc(sizeof(char*)*INPUT_BUFFER_SIZE)),
+	//password((char*)malloc(sizeof(char*)* INPUT_BUFFER_SIZE)),
 	hScore(hScore),
 	totalGames(0),
 	totalScore(0),
@@ -18,18 +22,21 @@ Player::Player(const char* name, const char* password, int hScore) :
 	scorecards = (Scorecard**)malloc(sizeof(Scorecard*) * scorecardCapacity);
 }
 
-//Player::Player() :	
-//hScore(0),
-//totalGames(0),
-//totalScore(0),
-//avgScore(0),
-//scorecardCapacity(INITIAL_SCORECARD_SIZE),
-//numberOfScorecards(0)
-//{
-//	name[BUFFER_SIZE];
-//	password[BUFFER_SIZE];
-//	scorecards = (Scorecard**)malloc(sizeof(Scorecard*) * scorecardCapacity);
-//}
+Player::Player() :	
+//name(new char[INPUT_BUFFER_SIZE]),
+//password(new char[INPUT_BUFFER_SIZE]),
+name((char*)malloc(sizeof(char*)*INPUT_BUFFER_SIZE)),
+password((char*)malloc(sizeof(char*)* INPUT_BUFFER_SIZE)),
+hScore(0),
+totalGames(0),
+totalScore(0),
+avgScore(0),
+scorecardCapacity(INITIAL_SCORECARD_SIZE),
+numberOfScorecards(0)
+{
+	
+	scorecards = (Scorecard**)malloc(sizeof(Scorecard*) * scorecardCapacity);
+}
 
 Player::~Player()
 {

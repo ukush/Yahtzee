@@ -14,7 +14,7 @@ class Player
 {
 private:
     static const int INITIAL_SCORECARD_SIZE = 5;
-    static const int BUFFER_SIZE = 11;
+    static const int INPUT_BUFFER_SIZE = 11;
     char* name;
     char* password;
     int hScore;
@@ -27,8 +27,8 @@ private:
 
 
 public:
-    Player(const char* name, const char* password, int hScore);
-    //Player();
+    Player(char* name, char* password, int hScore);
+    Player();
     ~Player();
     void displayPlayerStats() const;
     void displayPlayerDetails() const;
@@ -47,7 +47,11 @@ public:
     void setNumberOfScorecards();
     void addScorecard(Scorecard* sc);
     int getTotalGames();
-    
+
+    int getAvgScore()
+    {
+        return avgScore;
+    }
     int getTotalScore()
     {
         return totalScore;
@@ -60,13 +64,17 @@ public:
 
     friend ostream& operator<< (std::ostream& os, Player& player)
     {
-        os << player.name << "\n" << player.encryptPassword((player.password), 3) << "\n" << player.hScore << "\n";
+        os << player.name << "\n" << player.encryptPassword((player.password), 3) << "\n" << player.hScore << "\n\n";
         return os;
     }
 
     friend istream& operator>> (std::istream& is, Player& player)
     {
-        is >> player.name >> player.decryptPassword((player.password), 3) >> player.hScore;
+        //char emptyLine[INPUT_BUFFER_SIZE];
+        is >> player.name >> player.password >> player.hScore;
+        player.password = player.decryptPassword(player.password, 3);
+        cout << player.name << " " << player.password << " " << player.hScore << "\n";
+
         return is;
     }
 
