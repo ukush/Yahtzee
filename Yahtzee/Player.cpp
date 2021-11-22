@@ -2,38 +2,56 @@
 #include <iostream>
 #include <iomanip>
 
-const int INITIAL_SIZE = 5;
-int Player::counter = 1;
 
-Player::Player()
-{
-}
 
 Player::Player(const char* name, const char* password, int hScore) :
 
-	playerid(counter++),
 	name(_strdup(name)),			// dynamically allocates memory using malloc
 	password(_strdup(password)),	// dynamically allocates memory using malloc
 	hScore(hScore),
-	history((int*)malloc(sizeof(int) * 3))
+	totalGames(0),
+	totalScore(0),
+	avgScore(0),
+	scorecardCapacity(INITIAL_SCORECARD_SIZE),
+	numberOfScorecards(0)
 {
-	scorecards = new Scorecard[5];
+	scorecards = (Scorecard**)malloc(sizeof(Scorecard*) * scorecardCapacity);
 }
+
+//Player::Player() :	
+//hScore(0),
+//totalGames(0),
+//totalScore(0),
+//avgScore(0),
+//scorecardCapacity(INITIAL_SCORECARD_SIZE),
+//numberOfScorecards(0)
+//{
+//	name[BUFFER_SIZE];
+//	password[BUFFER_SIZE];
+//	scorecards = (Scorecard**)malloc(sizeof(Scorecard*) * scorecardCapacity);
+//}
 
 Player::~Player()
 {
 	// 'delete' calls this and releases the memory
 	free(name);
 	free(password);
-	free(scorecards);
+
+	//free memory for each scorecard object in the array
+	for (int i = 0; i < numberOfScorecards; i++)
+	{
+		delete scorecards[i];
+	}
+
+	free(scorecards); // release memory for array of pointers
 }
 
 void Player::displayPlayerStats() const
 {
 	cout << "High Score: " << "\t\t\t" << hScore << "\n";
-	cout << "Total Games: " << "\t\t\t"  << history[0] <<"\n";
-	cout << "Accumulated Score: " << "\t\t" << history[1] << "\n";
-	cout << "Average Score: " << "\t\t\t"  << history[2] <<"\n";
+	cout << "Total Games: " << "\t\t\t" << totalGames << "\n";
+	cout << "Accumulated Score: " << "\t\t" << totalScore << "\n";
+	cout << "Average Score: " << "\t\t\t" << avgScore << "\n";
 	cout << "\n";
 }
 
@@ -67,35 +85,104 @@ bool Player::compareNames(const Player* rhs) const
 	else return false;
 }
 
-int Player::getPlayerId()
-{
-	return playerid;
-}
-
 void Player::updateHighscore(int score)
 {
 	if (score > hScore)
+	{
 		hScore = score;
+		cout << "Congratulations, you've got a new high score!\n";
+	}
 	else
 	{
-		cout << "Unlucky, you didn't get a high score this time!\n";
+		cout << "Unlucky, you didn't get a high score this time\n";
 	}
 }
 
-void Player::setHistory(int tGames, int tScore, int avgScore)
+Scorecard* Player::getScorecard(int index)
 {
-	history[0] = tGames;
-	history[1] = tScore;
-	history[2] = avgScore;
+	return scorecards[index];
 }
 
-void Player::initHistory()
+int Player::getScorecardCapacity()
 {
-	for (int i = 0; i < 3; i++)
+	return scorecardCapacity;
+}
+
+int Player::getNumberOfScorecards()
+{
+	return numberOfScorecards;
+}
+
+char* Player::encryptPassword(char* plaintextPw, int key)
+{
+	/*
+	* Caesar Cipher routine found here - changed slightly
+	* https://www.thecrazyprogrammer.com/2016/11/caesar-cipher-c-c-encryption-decryption.html
+	*/
+
+	char c;
+	for (int i = 0; plaintextPw[i] != '\0'; i++)
 	{
-		history[i] = 0;
+		c = plaintextPw[i];
+		if (c >= 97 && c <= 122)            // if between lower case a-z inclusive
+		{
+			c += key;                       // shift 3 letters up 
+			if (c > 122)
+			{
+				c = c - 122 + 97 - 1;       // if non-letter, wrap around the aplhabet to a letter
+			}
+			plaintextPw[i] = c;
+		}
+		else if (c >= 65 && c <= 90)       //  if between upper case A-Z inclusive 
+		{
+			c += key;                      // shift 3 letters up
+			if (c > 90)
+			{
+				c = c - 90 + 65 - 1;     // wrap around
+			}
+			plaintextPw[i] = c;
+		}
 	}
+
+	return plaintextPw;
 }
+
+char* Player::decryptPassword(char* ciphertextPw, int key)
+{
+
+	/*
+	* Caesar Cipher routine found here - changed slightly
+	* https://www.thecrazyprogrammer.com/2016/11/caesar-cipher-c-c-encryption-decryption.html
+	*/
+
+	char c;
+	for (int i = 0; ciphertextPw[i] != '\0'; i++)
+	{
+		c = ciphertextPw[i];
+
+		if (c >= 97 && c <= 122)            // if between lower case a-z inclusive
+		{
+			c -= key;                       // shift 3 letters down 
+			if (c < 97)
+			{
+				c = c + 122 - 97 + 1;       // if non-letter, wrap around the aplhabet to a letter
+			}
+			ciphertextPw[i] = c;
+		}
+		else if (c >= 65 && c <= 90)       //  if between upper case A-Z inclusive 
+		{
+			c -= key;                      // shift 3 letters down
+			if (c < 65)
+			{
+				c = c + 90 - 65 + 1;     // wrap around
+			}
+			ciphertextPw[i] = c;
+		}
+	}
+
+	return ciphertextPw;
+}
+
 
 bool Player::operator < (const Player* rhs) const
 {
@@ -103,48 +190,72 @@ bool Player::operator < (const Player* rhs) const
 	return hScore > rhs->hScore;
 }
 
-void Player::displayPlayer() const
+void Player::displayPlayerDetails() const
 {
 	cout << name << "\t\t\t" << hScore;
 	cout << "\n";
 }
 
-void Player::updatePlayerHistory(int gameScore)
+void Player::updatePlayerStats(int gameScore)
 {
-	history[0] += 1;
-	history[1] += gameScore;
-	history[2] = history[1] / history[0];
+	totalGames += 1;
+	totalScore += gameScore;
+	avgScore = totalScore / totalGames;
 }
 
-//void Player::addScorecard(Scorecard* sc, int size)
-//{
-//	// Allocate new temp array with increased size
-//	Scorecard* temp = new Scorecard[size + 1];
-//
-//	// copy everything from current array to temp array
-//	for (int i = 0; i < size; i++)
-//	{
-//		temp[i] = scorecards[i];
-//	}
-//
-//	// delete current array
-//	delete[] scorecards;
-//
-//	// save pointer temp to current array
-//	scorecards = temp;
-//
-//	//increment size;
-//	size++;
-//
-//	scorecards[size - 1] = sc;
-//
-//
-//}
+void Player::increaseScorecardCapacity()
+{
+	scorecardCapacity *= 2; // double the capacity each time
+}
 
+void Player::setNumberOfScorecards()
+{
+	numberOfScorecards += 1;
+}
+
+void Player::addScorecard(Scorecard* sc)
+{
+	// check if capacity is full
+	if (numberOfScorecards <= scorecardCapacity)
+	{
+		// not full so add
+		scorecards[numberOfScorecards - 1] = sc;
+	}
+	else
+	{
+		// increase the capacity
+		// add scorecard to end
+
+		increaseScorecardCapacity();
+		Scorecard** newScorecards = (Scorecard**)realloc(scorecards, (sizeof(Scorecard*) * scorecardCapacity)); // create a new pointer to an array of scorecards
+		if (newScorecards == NULL)																				// if realloc is unsuccessful, the old pointer remains intact	
+		{
+			cout << "ERROR: MEMORY REALLOCATION FOR " << sizeof(Scorecard*) *scorecardCapacity << "FAILED\n";
+			cout << "You've run out of memory, your games will not be saved\n\n";
+			//free(scorecards);
+		}
+
+		scorecards = newScorecards;
+																		
+	}
+}
 
 int Player::getTotalGames()
 {
-	return history[0];
+	return totalGames;
 }
+
+bool Player::noScorecards()
+{
+	if (numberOfScorecards == 0)
+	{
+		cout << "\nERROR: There are no scorecards to display\n";
+		return true;
+	}
+	else return false;
+
+}
+
+
 
 
