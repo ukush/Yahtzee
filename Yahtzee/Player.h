@@ -64,16 +64,15 @@ public:
 
     friend ostream& operator<< (std::ostream& os, Player& player)
     {
-        os << player.name << "\n" << player.encryptPassword((player.password), 3) << "\n" << player.hScore << "\n\n";
+        os << player.name << "\n" << player.encryptPassword((player.password), 3) << "\n" << player.hScore << "\n";
         return os;
     }
 
     friend istream& operator>> (std::istream& is, Player& player)
     {
-        //char emptyLine[INPUT_BUFFER_SIZE];
-        is >> player.name >> player.password >> player.hScore;
-        player.password = player.decryptPassword(player.password, 3);
-        cout << player.name << " " << player.password << " " << player.hScore << "\n";
+        
+        is >> player.name >> player.password >> player.hScore; // set the details
+        player.password = player.decryptPassword(player.password, 3); // decrypt the password and store in memory
 
         return is;
     }

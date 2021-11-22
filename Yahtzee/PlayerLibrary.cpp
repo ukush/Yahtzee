@@ -7,14 +7,14 @@ PlayerLibrary::PlayerLibrary()
     // creates objects using the info in the yahtzee.txt file
     // adds them object to the list
 
-    ifstream in("Yahtzee.txt");
+    ifstream in("Yahtzee.txt"); // open file
     
     while (true)
     {
-        Player* temp = new Player();
-        in >> *temp;
-        playerList.push_back(temp);
-        if (in.eof())
+        Player* temp = new Player(); // create new player object
+        in >> *temp;                 // load in player details from file
+        playerList.push_back(temp);  // add to vector
+        if (in.eof())                // when we reach the end, break from the loop
             break;
     }
 
