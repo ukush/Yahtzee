@@ -8,10 +8,6 @@ Player::Player(char* name, char* password, int hScore) :
 
 	name(_strdup(name)),			// dynamically allocates memory using malloc
 	password(_strdup(password)),	// dynamically allocates memory using malloc
-	//name(new char[INPUT_BUFFER_SIZE]),
-	//password(new char[INPUT_BUFFER_SIZE]),
-	//name((char*)malloc(sizeof(char*)*INPUT_BUFFER_SIZE)),
-	//password((char*)malloc(sizeof(char*)* INPUT_BUFFER_SIZE)),
 	hScore(hScore),
 	totalGames(0),
 	totalScore(0),
@@ -22,9 +18,7 @@ Player::Player(char* name, char* password, int hScore) :
 	scorecards = (Scorecard**)malloc(sizeof(Scorecard*) * scorecardCapacity);
 }
 
-Player::Player() :	
-//name(new char[INPUT_BUFFER_SIZE]),
-//password(new char[INPUT_BUFFER_SIZE]),
+Player::Player() :
 name((char*)malloc(sizeof(char*)*INPUT_BUFFER_SIZE)),
 password((char*)malloc(sizeof(char*)* INPUT_BUFFER_SIZE)),
 hScore(0),
@@ -226,7 +220,18 @@ void Player::addScorecard(Scorecard* sc)
 	if (numberOfScorecards <= scorecardCapacity)
 	{
 		// not full so add
-		scorecards[numberOfScorecards - 1] = sc;
+
+		if (numberOfScorecards == 0)
+		{
+			scorecards[0] = sc;
+		}
+		else
+		{
+			scorecards[numberOfScorecards] = sc;
+
+		}
+
+		numberOfScorecards++;
 	}
 	else
 	{
@@ -237,7 +242,7 @@ void Player::addScorecard(Scorecard* sc)
 		Scorecard** newScorecards = (Scorecard**)realloc(scorecards, (sizeof(Scorecard*) * scorecardCapacity)); // create a new pointer to an array of scorecards
 		if (newScorecards == NULL)																				// if realloc is unsuccessful, the old pointer remains intact	
 		{
-			cout << "ERROR: MEMORY REALLOCATION FOR " << sizeof(Scorecard*) *scorecardCapacity << "FAILED\n";
+			cout << "ERROR: Memory Allocation for " << sizeof(Scorecard*) *scorecardCapacity << " bytes failed\n";
 			cout << "You've run out of memory, your games will not be saved\n\n";
 			//free(scorecards);
 		}
@@ -250,6 +255,30 @@ void Player::addScorecard(Scorecard* sc)
 int Player::getTotalGames()
 {
 	return totalGames;
+}
+
+void Player::loadHistory()
+{
+	string filename(name);
+	filename = filename + ".txt";
+
+	ifstream in(filename);
+	if (in.is_open())
+	{
+		in >> totalScore >> totalGames >> avgScore;
+
+		for (int i = 1; i <= totalGames; i++)
+		{
+			Scorecard* sc = new Scorecard(i);				// create new scorecard
+			in >> *sc;										// load scorecard history
+			addScorecard(sc);								// add scorecard to player's scorecard history
+		}
+		in.close();
+	}
+	else
+	{
+		cout << "ERROR: Unable to retireve player history\n\n";
+	}
 }
 
 bool Player::noScorecards()

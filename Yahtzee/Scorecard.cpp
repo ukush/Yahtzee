@@ -10,6 +10,14 @@ Scorecard::Scorecard(int gameNumber) :
 	memset(scores, 0, sizeof(int) * numberOfLines);
 }
 
+//Scorecard::Scorecard() :
+//	gameNumber(0),
+//	gameTotal(0),
+//	now(time(0)),
+//{
+//
+//}
+
 Scorecard::~Scorecard()
 {
 }
@@ -71,22 +79,3 @@ void Scorecard::displayTimestamp()
 {
 	cout << timestamp;
 }
-
-//int Scorecard::getTotalGames()
-//{
-//	return totalGames;
-//}
-//void Scorecard::displayPlayerStats() const
-//{
-//	cout << "Total Games: " << "\t\t\t" << totalGames << "\n";
-//	cout << "Accumulated Score: " << "\t\t" << totalScore << "\n";
-//	cout << "Average Score: " << "\t\t\t" << avgScore << "\n";
-//	cout << "\n";
-//}
-//void Scorecard::updatePlayerStats(int gameScore)
-//{
-//	totalGames += 1;
-//	totalScore += gameScore;
-//	avgScore = totalScore / totalGames;
-//}
-

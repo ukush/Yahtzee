@@ -25,8 +25,8 @@ public:
 
 	void displayPlayerDetails() const
 	{
-		cout << "\nPlayer Name:\t Highest Score:\n";
-		cout << "------------\t --------------\n";
+		cout << "\nPlayer Name:\tHighest Score:\n";
+		cout << "------------\t--------------\n";
 
 		for_each(playerList.cbegin(), playerList.cend(), [](const Player* player)
 			{

@@ -93,8 +93,6 @@ int main()
         {
             playerLib->savePlayers();
 
-
-
             // free memory of each player
             delete playerLib;
             cout << "\nThanks for Playing!\n";
@@ -144,13 +142,10 @@ void playMenu(Player& currentPlayer)
     const int MENU_RETURN = 9;
 
 
-    cout << "Weclome to Yahtzee Play Arena\n------------------------------\n\n";
-    // load player history from file
-    // if no file exists, it is a new player
-    // create new scorecard(history) updatePlayerStats()
-    // currentPlayer->displayHighscore()
-    // scorecard->displayPlayerStats();
+    cout << "\nWeclome to Yahtzee Play Arena\n------------------------------\n\n";
 
+
+    currentPlayer.loadHistory();
     currentPlayer.displayPlayerStats();
 
 
@@ -161,7 +156,7 @@ void playMenu(Player& currentPlayer)
         cout << "2) View Scorecards\n";
         cout << "9) Return To Main Menu\n";
 
-choice = getMenuChoice(MENU_PLAY_GAME, MENU_RETURN);
+        choice = getMenuChoice(MENU_PLAY_GAME, MENU_RETURN);
 
         switch (choice)
         {
@@ -199,7 +194,7 @@ void playYahtzee(Player& currentPlayer)
     int gameNumber = currentPlayer.getTotalGames(); // get the total number of games
     Scorecard* scorecard = new Scorecard(gameNumber + 1); // create a scorecard where the game number starts from where the player left off last time and increment by 1
 
-    currentPlayer.setNumberOfScorecards();
+    //currentPlayer.setNumberOfScorecards();
 
     // display empty scorecard
     scorecard->printScorecard();

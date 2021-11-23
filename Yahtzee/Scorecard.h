@@ -2,6 +2,7 @@
 #include <ctime>
 #include <malloc.h>
 #include <iostream>
+#include <string>
 
 using namespace std;
 
@@ -19,6 +20,7 @@ private:
 
 public:
 	Scorecard(int gameNumber);
+	//Scorecard();
 	~Scorecard();
 	void printScorecard();
 	void updateTotal(int score);
@@ -35,20 +37,23 @@ public:
 		{
 			os << sc.scores[i] << "\n";
 		}
+		os << sc.gameTotal << "\n";
 		return os;
 	}
 
-	//void printDateTime()
-	//{
-	//	cout << nowLocal.tm_wday << " " << nowLocal.tm_mday << " " << nowLocal.tm_year << "\n";
-	//}
+	friend istream& operator>> (std::istream& is, Scorecard& sc)
+	{
+		string line;
+		(getline(is, line));
+		(getline(is, line));
+		strcpy_s(sc.timestamp, line.c_str());
+		for (int i = 0; i < sc.numberOfLines; i++)
+		{
+			is >> sc.scores[i];
+		}
 
-	//void displayPlayerStats() const;
-	//void updateGameNumber()
-	//{
-	//	gameNumber = totalGames + 1;
-	//}
-	//void updatePlayerStats(int gameScore);
-	//int getTotalGames();
+		is >> sc.gameTotal;
+		return is;
+	}
 };
 

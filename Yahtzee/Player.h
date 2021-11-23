@@ -47,6 +47,7 @@ public:
     void setNumberOfScorecards();
     void addScorecard(Scorecard* sc);
     int getTotalGames();
+    void loadHistory();
 
     int getAvgScore()
     {

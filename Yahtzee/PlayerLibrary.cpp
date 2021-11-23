@@ -1,5 +1,6 @@
 #include "PlayerLibrary.h"
 
+
 PlayerLibrary::PlayerLibrary()
 {
     //MAIN_FILENAME = "Yahtzee.txt";
@@ -7,15 +8,29 @@ PlayerLibrary::PlayerLibrary()
     // creates objects using the info in the yahtzee.txt file
     // adds them object to the list
 
-    ifstream in("Yahtzee.txt"); // open file
-    
-    while (true)
+    ifstream in ("Yahtzee.txt"); // open file
+    if (in.is_open())
     {
-        Player* temp = new Player(); // create new player object
-        in >> *temp;                 // load in player details from file
-        playerList.push_back(temp);  // add to vector
-        if (in.eof())                // when we reach the end, break from the loop
-            break;
+
+
+
+
+
+        while (true)
+        {
+            Player* temp = new Player(); // create new player object
+            in >> *temp;                 // load in player details from file
+            playerList.push_back(temp);  // add to vector
+            if (in.eof())                // when we reach the end, break from the loop
+            {
+                break;
+            }
+        }
+        in.close();
+    }
+    else
+    {
+        cout << "There are no Players to load\n";
     }
 
 }
@@ -113,7 +128,7 @@ Player* PlayerLibrary::choosePlayer()
 void PlayerLibrary::savePlayers()
 {
     // save player details to main txt file
-   ofstream out("Yahtzee.txt");
+    ofstream out("Yahtzee.txt");
    if (out.is_open())
    {
        // write player details to text file
@@ -121,6 +136,7 @@ void PlayerLibrary::savePlayers()
            {
                out << (*player); 
            });
+       out.close();
    }
    else
    {
@@ -128,8 +144,6 @@ void PlayerLibrary::savePlayers()
    }
 
     // save player history to specific player file
-
-
    for (auto it = playerList.begin(); it != playerList.end(); ++it) // use a for loop because we need to the index of the scorecard
    {
        // track the player object
@@ -142,14 +156,14 @@ void PlayerLibrary::savePlayers()
 
        if (out2.is_open())
        {
+           //write total score, games and avg score to text file
+           out2 << playerList[position]->getTotalScore() << "\n"
+               << playerList[position]->getTotalGames() << "\n"
+               << playerList[position]->getAvgScore() << "\n";
+
            for (int i = 0; i < playerList[position]->getNumberOfScorecards(); i++)
            {
-               //write total score, games and avg score to text file
-               out2 << playerList[position]->getTotalScore() << "\n"    
-                   << playerList[position]->getTotalGames() << "\n"
-                   << playerList[position]->getAvgScore() << "\n";
-
-               // write timestamped scorecards to text file
+               // write timestamped scorecards to text file (overload)
                out2 << *playerList[position]->getScorecard(i);
            }
        }
