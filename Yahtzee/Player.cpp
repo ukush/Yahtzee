@@ -121,7 +121,7 @@ void Player::displayScorecards()
 		}
 		case 2:
 		{
-			// if current scorecard is 0 aka the last scorecard, cannot go forward
+			// if current scorecard the last scorecard, cannot go forward
 			if (currentScorecard < indexOfLast)
 			{
 				currentScorecard += 1;

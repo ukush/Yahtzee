@@ -19,6 +19,7 @@ const int MENU_EXIT = 9;
 const int MENU_PLAY_GAME = 1;
 const int MENU_VIEW_SCORECARD = 2;
 const int MENU_RETURN = 9;
+bool firstStartup = true;
 
 void displayMenu();
 int getMenuChoice(const int firstOption, const int lastOption);
@@ -129,9 +130,11 @@ void playMenu(Player& currentPlayer)
 
     cout << "\nWeclome to Yahtzee Play Arena\n------------------------------\n\n";
 
-    currentPlayer.loadHistory();                // loads total score, games and avg score
+    if (firstStartup)
+        currentPlayer.loadHistory();                // loads total score, games and avg score (only on inital start up)
     currentPlayer.displayPlayerStats();
 
+    firstStartup = false;
 
     int choice;
 
@@ -177,7 +180,6 @@ void playYahtzee(Player& currentPlayer)
     int gameNumber = currentPlayer.getTotalGames(); // get the total number of games
     Scorecard* scorecard = new Scorecard(gameNumber + 1); // create a scorecard where the game number starts from where the player left off last time and increment by 1
 
-
     // display empty scorecard
     scorecard->printScorecard();
 
@@ -202,7 +204,6 @@ void playYahtzee(Player& currentPlayer)
         playRound(dice, i);             // i is current round
 
         calcScore(dice, *scorecard);   
-
 
         // display the scorecard for this game
         scorecard->printScorecard();
