@@ -23,45 +23,30 @@ private:
 
 
 public:
+	//constructor/destructor
 	Scorecard(int gameNumber);
-	//Scorecard();
 	~Scorecard();
-	void printScorecard();
-	void updateTotal(int score);
+
+	// getters
 	int getTotal();
 	int getGameNumber();
-	void updateScorecard(int index, int score);
+
+	// display methods
+	void printScorecard();
 	void displayTimestamp();
 	void displayHistoricScorecard();
-	bool checkCategoryState(int category);
+
+	// update(set) methods
+	void updateTotal(int score);
+	void updateScorecard(int index, int score);
 	void updateCategoryStates(int category);
 	void resetCategoryStates();
 
-	friend ostream& operator<< (std::ostream& os, Scorecard& sc)
-	{
-		os << sc.timestamp;
-		for (int i = 0; i < sc.numberOfLines; i++)
-		{
-			os << sc.scores[i] << "\n";
-		}
-		os << sc.gameTotal << "\n";
-		return os;
-	}
+	// Operator overloads
+	friend ostream& operator<< (std::ostream& os, Scorecard& sc);
+	friend istream& operator>> (std::istream& is, Scorecard& sc);
 
-	friend istream& operator>> (std::istream& is, Scorecard& sc)
-	{
-		string line;
-		(getline(is, line));
-		(getline(is, line));
-		strcpy_s(sc.timestamp, line.c_str());
-		for (int i = 0; i < sc.numberOfLines; i++)
-		{
-			is >> sc.scores[i];
-		}
-
-		is >> sc.gameTotal;
-		return is;
-	}
+	bool checkCategoryState(int category);
 
 };
 

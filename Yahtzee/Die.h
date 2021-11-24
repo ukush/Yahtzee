@@ -7,31 +7,27 @@ using namespace std;
 class Die
 {
 private:
+	static const int MAX_RANGE = 6;
+	static const int MIN_RANGE = 1;
+
 	int value;
 	bool held;
 
 public:
+	//constructor/destructor
 	Die();
 	~Die();
+
+	//inlined methods
 	void rollDie()
 	{
-		const int MAX_RANGE = 6;
-		const int MIN_RANGE = 1;
-
 		// randomly generate number between 1 and 6
 		if (!held)
 		{
 			value = (rand() % MAX_RANGE) + MIN_RANGE;
 		}
-
-		value = value; // value remains the same
+		value = value; // value remains the same if it's already been held
 	}
-
-	int getDie()
-	{
-		return value;
-	}
-
 	void holdDie()
 	{
 		if (held)
@@ -43,12 +39,7 @@ public:
 			held = true;
 		}
 	}
-
-	void UnholdDie()
-	{
-		held = false;
-	}
-
+	void UnholdDie();
 	void displayDie()
 	{
 		cout << " " << value;
@@ -57,7 +48,10 @@ public:
 		else
 			cout << "\t\n";
 	}
-
+	int getDie()
+	{
+		return value;
+	}
 	bool isHeld()
 	{
 		if (held)

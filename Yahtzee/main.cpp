@@ -16,14 +16,15 @@ const int MENU_REMOVE_PLAYER = 3;
 const int MENU_SORT_ALPHABETICALLY = 4;
 const int MENU_SORT_HIGHEST_SCORE = 5;
 const int MENU_EXIT = 9;
-const int BUFFER_SIZE = 11;
+const int MENU_PLAY_GAME = 1;
+const int MENU_VIEW_SCORECARD = 2;
+const int MENU_RETURN = 9;
 
 void displayMenu();
 int getMenuChoice(const int firstOption, const int lastOption);
 void playMenu(Player& currentPlayer);
 void playYahtzee(Player& currentPlayer);
 bool allDiceHeld(const vector<Die*>& dice);
-void displayScorecards(Player& currentPlayer);
 void playRound(vector<Die*>& dice, int i);
 void calcScore(vector<Die*>& dice, Scorecard& scorecard);
 
@@ -50,9 +51,9 @@ int main()
         {
         case MENU_CHOOSE_PLAYER:
         {
-            Player* currentPlayer = playerLib->choosePlayer();
-            if (currentPlayer == nullptr)
-                break;
+            Player* currentPlayer = playerLib->choosePlayer();          // select a player
+            if (currentPlayer == nullptr)                               // if the player is not found a null ptr is returned
+                break;  
             else
                 playMenu(*currentPlayer);
             break;
@@ -79,16 +80,16 @@ int main()
         }
         case MENU_EXIT:
         {
-            playerLib->savePlayers();
+            playerLib->savePlayers();                   // write all player details to files
 
-            // free memory of each player
-            delete playerLib;
+            delete playerLib;                           // free memory of each player
+
             cout << "\nThanks for Playing!\n";
             break;
         }
         default:
         {
-            cout << "\nERROR: INVALID OPTION\n";
+            cout << "\nERROR: Invalid option\n";
             break;
         }
 
@@ -125,15 +126,10 @@ int getMenuChoice(const int firstOption, const int lastOption)
 
 void playMenu(Player& currentPlayer)
 {
-    const int MENU_PLAY_GAME = 1;
-    const int MENU_VIEW_SCORECARD = 2;
-    const int MENU_RETURN = 9;
-
 
     cout << "\nWeclome to Yahtzee Play Arena\n------------------------------\n\n";
 
-
-    currentPlayer.loadHistory();
+    currentPlayer.loadHistory();                // loads total score, games and avg score
     currentPlayer.displayPlayerStats();
 
 
@@ -157,9 +153,8 @@ void playMenu(Player& currentPlayer)
         {
             if (!currentPlayer.noScorecards())
             {
-                displayScorecards(currentPlayer);
+                currentPlayer.displayScorecards();
             }
-
             break;
         }
         case 9:
@@ -169,7 +164,7 @@ void playMenu(Player& currentPlayer)
         }
         default:
         {
-            cout << "ERROR: INVALID OPTION\n";
+            cout << "ERROR: Invalid option\n";
             break;
         }
         }
@@ -266,6 +261,8 @@ void playRound(vector<Die*>& dice, int i)
         bool holding = true;
         do {
             cin >> hold;
+
+            // hold die
             switch (hold)
             {
             case 0:
@@ -317,7 +314,7 @@ void playRound(vector<Die*>& dice, int i)
             }
             default:
             {
-                cout << "ERROR: INVALID OPTION\n";
+                cout << "ERROR: Invalid option\n";
                 break;
             }
 
@@ -497,83 +494,6 @@ void calcScore(vector<Die*>& dice, Scorecard& scorecard)
 
     } while (scoreAgainst < 1 || scoreAgainst > 6); // validate input
 }
-
-
-void displayScorecards(Player& currentPlayer)
-{
-    cout << "Loading Scorecards...\n\n";
-
-    //load the first scorecard
-    //get index of last scorecard
-    int indexOfLast = currentPlayer.getNumberOfScorecards() - 1;
-    int currentScorecard = 0;
-
-    currentPlayer.getScorecard(currentScorecard)->displayHistoricScorecard();
-    //cout << "Date Played: \t";
-    //currentPlayer.getScorecard(currentScorecard)->displayTimestamp();
-    //currentPlayer.getScorecard(currentScorecard)->printScorecard();
-
-
-
-    int scorecardMenuChoice;
-
-    do {
-        cout << "\n1) View the Previous Scorecard\n";
-        cout << "2) View the Next Scorecard\n";
-        cout << "9) Return To Main Menu\n";
-
-        scorecardMenuChoice = getMenuChoice(1, 9);
-
-        switch (scorecardMenuChoice)
-        {
-        case 1:
-        {
-            // if current scorecard is 0 aka the first scorecard, cannot go back
-            if (currentScorecard == 0)
-            {
-                cout << "\nERROR: CANNOT VIEW PREVIOUS SCORECARD\n\n";
-            }
-            else
-            {
-                currentScorecard -= 1;
-                currentPlayer.getScorecard(currentScorecard)->displayHistoricScorecard();
-
-                //cout << "Date Played: \t";
-                //currentPlayer.getScorecard(currentScorecard)->displayTimestamp();
-                //currentPlayer.getScorecard(currentScorecard)->printScorecard();
-            }
-            break;
-        }
-        case 2:
-        {
-            // if current scorecard is 0 aka the last scorecard, cannot go forward
-            if (currentScorecard < indexOfLast)
-            {
-                currentScorecard += 1;
-                currentPlayer.getScorecard(currentScorecard)->displayHistoricScorecard();
-                //cout << "Date Played: \t";
-                //currentPlayer.getScorecard(currentScorecard)->displayTimestamp();
-                //currentPlayer.getScorecard(currentScorecard)->printScorecard();
-            }
-            else
-                cout << "\nERROR: CANNOT VIEW NEXT SCORECARD\n\n";
-
-            break;
-        }
-        case 9:
-        {
-            break;
-        }
-        default:
-        {
-            cout << "ERROR: INVALID OPTION\n";
-            break;
-        }
-
-        }
-    } while (scorecardMenuChoice != 9);
-}
-
 
 bool allDiceHeld(const vector<Die*>& dice)
 {

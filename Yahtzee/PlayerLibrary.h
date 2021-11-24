@@ -12,51 +12,27 @@ class PlayerLibrary
 
 private:
 	vector<Player*> playerList;
+
 	static const int BUFFER_SIZE = 11;
-	//static const char* MAIN_FILENAME;
+	static const char* MAIN_FILENAME;
 
 public:
+	//constructor/destructor
 	PlayerLibrary();
 	~PlayerLibrary();
+
+	// adding, removing searching methods
+	vector<Player*>::const_iterator searchPlayer();
 	void addPlayer();
 	void removePlayer();
 	Player* choosePlayer();
+	void displayPlayerDetails() const;
+
+	// I/O method
 	void savePlayers();
 
-	void displayPlayerDetails() const
-	{
-		cout << "\nPlayer Name:\tHighest Score:\n";
-		cout << "------------\t--------------\n";
-
-		for_each(playerList.cbegin(), playerList.cend(), [](const Player* player)
-			{
-				player->displayPlayerDetails();
-			});
-		cout << "\n";
-	}
-
-
-	vector<Player*>::const_iterator searchPlayer();
-
-	void sortAlphabetically()
-	{
-		cout << "\nSorting Player Alphabetically...\n";
-		sort(playerList.begin(), playerList.end(), [](const Player* lhs, const Player* rhs)
-			{
-				// cannot overload '<' for c strings
-				return lhs->compareNames(rhs);
-
-			});
-	}
-
-	void sortByHighestScore()
-	{
-		cout << "\nSorting by Highest Score...\n";
-		sort(playerList.begin(), playerList.end(), [](const Player* lhs, const Player* rhs)
-			{
-				//overload the '<' operator to perform sort
-				return (*lhs) < rhs;
-			});
-	}
+	//sort methods
+	void sortAlphabetically();
+	void sortByHighestScore();
 
 };

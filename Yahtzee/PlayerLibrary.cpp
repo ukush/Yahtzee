@@ -1,21 +1,22 @@
 #include "PlayerLibrary.h"
 
 
+const char* PlayerLibrary::MAIN_FILENAME = "Yahtzee.txt";
+
+
+//constructor/destructor
 PlayerLibrary::PlayerLibrary()
 {
-    //MAIN_FILENAME = "Yahtzee.txt";
 
     // creates objects using the info in the yahtzee.txt file
     // adds them object to the list
 
-    ifstream in ("Yahtzee.txt"); // open file
+    ifstream in (MAIN_FILENAME); // open file
     if (in.is_open())
     {
-        Player* temp = new Player(); // create new player object
-        in >> *temp;                 // load in player details from file
-        playerList.push_back(temp);  // add to vector
-        
-        while (in.peek() != EOF)         // issue here
+
+        string str;
+        while (getline(in, str))         // issue here
         {
             Player* temp = new Player(); // create new player object
             in >> *temp;                 // load in player details from file
@@ -30,7 +31,6 @@ PlayerLibrary::PlayerLibrary()
     }
 
 }
-
 PlayerLibrary::~PlayerLibrary()
 {
     // release memory for each player in the vector
@@ -42,6 +42,39 @@ PlayerLibrary::~PlayerLibrary()
         
 }
 
+// adding, removing searching methods
+vector<Player*>::const_iterator PlayerLibrary::searchPlayer()
+{
+    char name[BUFFER_SIZE];
+    cout << "\nEnter player name:\n";
+    cin >> setw(BUFFER_SIZE - 1) >> name;
+    cin.clear();
+    cin.ignore(1000, '\n');
+
+    // take in user input for password
+    char Pw[BUFFER_SIZE];
+    cout << "Enter the password:\n";
+    cin >> setw(BUFFER_SIZE - 1) >> Pw;
+    cin.clear();
+    cin.ignore(1000, '\n');
+
+
+    // search through list for a match for BOTH name and Password
+    auto it = find_if(playerList.begin(), playerList.end(), [&name, &Pw](Player* player) -> bool
+        {
+            if ((player->isPlayerName(name)) && (player->isPassword(Pw)))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+
+        });
+
+    return it;
+}
 void PlayerLibrary::addPlayer()
 {
     cout << "\nAdd Player\n----------\n";
@@ -85,7 +118,6 @@ void PlayerLibrary::addPlayer()
         //displayPlayerDetails();
     }
 }
-
 void PlayerLibrary::removePlayer()
 {
     cout << "\nRemove Player Player\n----------\n";
@@ -108,7 +140,6 @@ void PlayerLibrary::removePlayer()
     //display updated list
     //displayPlayerDetails();
 }
-
 Player* PlayerLibrary::choosePlayer()
 {
     auto it = searchPlayer();
@@ -120,11 +151,23 @@ Player* PlayerLibrary::choosePlayer()
         return nullptr;
     }
 }
+void PlayerLibrary::displayPlayerDetails() const
+{
+    cout << "\nPlayer Name:\tHighest Score:\n";
+    cout << "------------\t--------------\n";
 
+    for_each(playerList.cbegin(), playerList.cend(), [](const Player* player)
+        {
+            player->displayPlayerDetails();
+        });
+    cout << "\n";
+}
+
+// I/O method
 void PlayerLibrary::savePlayers()
 {
     // save player details to main txt file
-    ofstream out("Yahtzee.txt");
+    ofstream out(MAIN_FILENAME);
    if (out.is_open())
    {
        // write player details to text file
@@ -136,7 +179,7 @@ void PlayerLibrary::savePlayers()
    }
    else
    {
-       cout << "THERE WAS AN ERROR WRITING TO FILE\n";
+       cout << "ERROR: Cannot write to file\n";
    }
 
     // save player history to specific player file
@@ -153,9 +196,10 @@ void PlayerLibrary::savePlayers()
        if (out2.is_open())
        {
            //write total score, games and avg score to text file
-           out2 << playerList[position]->getTotalScore() << "\n"
+           out2 << "\n"
+               << playerList[position]->getTotalScore() << "\n"
                << playerList[position]->getTotalGames() << "\n"
-               << playerList[position]->getAvgScore() << "\n";
+               << playerList[position]->getAvgScore();
 
            for (int i = 0; i < playerList[position]->getNumberOfScorecards(); i++)
            {
@@ -165,41 +209,30 @@ void PlayerLibrary::savePlayers()
        }
        else
        {
-           cout << "THERE WAS AN ERROR WRITING TO FILE\n";
+           cout << "ERROR: Cannot write to file\n";
        }
    }
 
 }
 
-vector<Player*>::const_iterator PlayerLibrary::searchPlayer()
+//sort methods
+void PlayerLibrary::sortAlphabetically()
 {
-    char name[BUFFER_SIZE];
-    cout << "\nEnter player name:\n";
-    cin >> setw(BUFFER_SIZE - 1) >> name;
-    cin.clear();
-    cin.ignore(1000, '\n');
-
-    // take in user input for password
-    char Pw[BUFFER_SIZE];
-    cout << "Enter the password:\n";
-    cin >> setw(BUFFER_SIZE - 1) >> Pw;
-    cin.clear();
-    cin.ignore(1000, '\n');
-
-
-    // search through list for a match for BOTH name and Password
-    auto it = find_if(playerList.begin(), playerList.end(), [&name, &Pw](Player* player) -> bool
+    cout << "\nSorting Player Alphabetically...\n";
+    sort(playerList.begin(), playerList.end(), [](const Player* lhs, const Player* rhs)
         {
-            if ((player->isPlayerName(name)) && (player->isPassword(Pw)))
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            // cannot overload '<' for c strings
+            return lhs->compareNames(rhs);
 
         });
-
-    return it;
 }
+void PlayerLibrary::sortByHighestScore()
+{
+    cout << "\nSorting by Highest Score...\n";
+    sort(playerList.begin(), playerList.end(), [](const Player* lhs, const Player* rhs)
+        {
+            //overload the '<' operator to perform sort
+            return (*lhs) < rhs;
+        });
+}
+
