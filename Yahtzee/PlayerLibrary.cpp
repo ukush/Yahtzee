@@ -94,7 +94,7 @@ void PlayerLibrary::addPlayer()
     if (it != playerList.end())
     {
         // the name matches so cannot create new player with same name
-        cout << "\nERROR: NAME ALREADY IN USE\n\n";
+        cout << "\nERROR: That name is already in use\n\n";
     }
     else
     {
@@ -134,7 +134,7 @@ void PlayerLibrary::removePlayer()
     }
     else
     {
-        cout << "\nERROR: CANNOT FIND PLAYER\n";
+        cout << "\nERROR: Cannot find player\n";
     }
 
     //display updated list

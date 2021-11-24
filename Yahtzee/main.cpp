@@ -331,7 +331,7 @@ void playRound(vector<Die*>& dice, int i)
     // check if they're all held don't roll again
     if (allDiceHeld(dice))
     {
-        cout << "\nYou've held all your dice...\nHere is your final roll\n";
+        cout << "\nYou've held all your dice...\n\nHere is your final roll\n";
         // simply display them
         for (Die* d : dice)
         {
