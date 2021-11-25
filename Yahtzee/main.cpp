@@ -19,7 +19,6 @@ const int MENU_EXIT = 9;
 const int MENU_PLAY_GAME = 1;
 const int MENU_VIEW_SCORECARD = 2;
 const int MENU_RETURN = 9;
-bool firstStartup = true;
 
 void displayMenu();
 int getMenuChoice(const int firstOption, const int lastOption);
@@ -130,11 +129,10 @@ void playMenu(Player& currentPlayer)
 
     cout << "\nWeclome to Yahtzee Play Arena\n------------------------------\n\n";
 
-    if (firstStartup)
+    if (!currentPlayer.isHistoryLoaded())           // if the history for that player has already been loaded, don't load again as it will override any updates to score if they go back to play menu
         currentPlayer.loadHistory();                // loads total score, games and avg score (only on inital start up)
     currentPlayer.displayPlayerStats();
 
-    firstStartup = false;
 
     int choice;
 

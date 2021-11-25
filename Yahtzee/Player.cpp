@@ -12,7 +12,8 @@ Player::Player(char* name, char* password, int hScore) :
 	totalScore(0),
 	avgScore(0),
 	scorecardCapacity(INITIAL_SCORECARD_SIZE),
-	numberOfScorecards(0)
+	numberOfScorecards(0),
+	historyLoaded(false)
 {
 	scorecards = (Scorecard**)malloc(sizeof(Scorecard*) * scorecardCapacity);
 }
@@ -24,7 +25,8 @@ totalGames(0),
 totalScore(0),
 avgScore(0),
 scorecardCapacity(INITIAL_SCORECARD_SIZE),
-numberOfScorecards(0)
+numberOfScorecards(0),
+historyLoaded(false)
 {
 	
 	scorecards = (Scorecard**)malloc(sizeof(Scorecard*) * scorecardCapacity);
@@ -68,6 +70,10 @@ Scorecard* Player::getScorecard(int index)
 int Player::getNumberOfScorecards()
 {
 	return numberOfScorecards;
+}
+bool Player::isHistoryLoaded()
+{
+	return historyLoaded;
 }
 
 
@@ -343,6 +349,7 @@ void Player::loadHistory()
 		cout << "ERROR: Unable to retireve player history\n\n";
 	}
 
+	historyLoaded = true;
 }
 
 //operator overloads

@@ -31,6 +31,8 @@ private:
     int scorecardCapacity;
     int numberOfScorecards;
 
+    bool historyLoaded;
+
 
 public:
     // constructors & destructor
@@ -45,6 +47,7 @@ public:
     int getTotalGames();
     Scorecard* getScorecard(int index);
     int getNumberOfScorecards();
+    bool isHistoryLoaded();
 
     // display methods
     void displayPlayerStats() const;
@@ -61,7 +64,7 @@ public:
     void updatePlayerStats(int gameScore);
     void increaseScorecardCapacity();
     void setNumberOfScorecards();
-    void addScorecard(Scorecard* sc);
+    void addScorecard(Scorecard* sc); 
 
     // encryption/decryption methods
     char* encryptPassword(char* plaintextPw, int key);
