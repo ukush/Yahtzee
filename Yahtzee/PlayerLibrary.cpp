@@ -16,7 +16,7 @@ PlayerLibrary::PlayerLibrary()
     {
 
         string str;
-        while (getline(in, str))         // issue here
+        while (getline(in, str))         
         {
             Player* temp = new Player(); // create new player object
             in >> *temp;                 // load in player details from file
